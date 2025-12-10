@@ -62,16 +62,12 @@ dt <- dt |>
   mutate(
     cum_excess_lead_1 = lead(excess_mortality_cumulative, n = 1),
     cum_excess_lead_2 = lead(excess_mortality_cumulative, n = 2),
-    new_deaths_covid_lag1 = lag(new_deaths_per_million, n = 1),
-    new_deaths_covid_1 = lead(new_deaths_per_million, n = 1),
-    new_deaths_covid_lag2 = lag(new_deaths_per_million, n = 2),
-    total_deaths_covid_2 = lead(total_deaths_per_million, n = 2),
-    new_cases_lead_1 = lead(new_cases_per_million, n = 1),
-    stringency_index_lead_2 = lead(stringency_index, n = 2),
-    stringency_index_lag_2 = lag(stringency_index, n = 2),
+    cum_excess_lead_3 = lead(excess_mortality_cumulative, n = 3),
+    cum_excess_lead_4 = lead(excess_mortality_cumulative, n = 4),
     mask_7day_percent = mask_7day*100,
-    excess_lead_1 = lead(excess_mortality),
+    excess_lead_1 = lead(excess_mortality, n = 1),
     excess_lead_2 = lead(excess_mortality, n = 2),
+    excess_lead_3 = lead(excess_mortality, n = 3),
     excess_lead_4 = lead(excess_mortality, n = 4),
     people_fully_vaccinated_per_hundred = replace_na(people_fully_vaccinated_per_hundred, 0) # 2020 didnt had any fully vaccinated
   )
@@ -85,19 +81,23 @@ dt21 <- dt |>
     date3 = floor_date(date2, "month")
   ) 
 
-mod1 <- feols(excess_lead_2 ~ mask_7day_percent | location + date, data = dt21)
-mod1
-mod2 <- feols(cum_excess_lead_2 ~ mask_7day_percent | location + date, data = dt21)
-mod2
+mod_w1 <- feols(excess_lead_1 ~ mask_7day_percent | location + date, data = dt21)
+mod_c1 <- feols(cum_excess_lead_1 ~ mask_7day_percent | location + date, data = dt21)
+mod_w2 <- feols(excess_lead_2 ~ mask_7day_percent | location + date, data = dt21)
+mod_c2 <- feols(cum_excess_lead_2 ~ mask_7day_percent | location + date, data = dt21)
+mod_w3 <- feols(excess_lead_3 ~ mask_7day_percent | location + date, data = dt21)
+mod_c3 <- feols(cum_excess_lead_3 ~ mask_7day_percent | location + date, data = dt21)
+mod_w4 <- feols(excess_lead_4 ~ mask_7day_percent | location + date, data = dt21)
+mod_c4 <- feols(cum_excess_lead_4 ~ mask_7day_percent | location + date, data = dt21)
 
-mod3 <- feols(mask_7day_percent ~ stringency_index_lag_2 | location + date, data = dt21)
-
-
-etable(mod1, mod2,mod3,
+etable(mod_w1, mod_w2,mod_w3,mod_w4,
        coefstat = "confint",
   vcov = "twoway"
 )
-
+etable(mod_c1, mod_c2,mod_c3,mod_c4,
+       coefstat = "confint",
+       vcov = "twoway"
+)
 
 dt_plot <- dt21 |> 
   filter(date>="2020-03-01") |> 
