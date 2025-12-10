@@ -27,9 +27,9 @@ masks <- bind_rows(masks20, masks21) |>
   group_by(location_id) |> 
   mutate(
     mask_7day = slide_index_dbl(
-      mask_use_mean,                       # calculate on new_cases
+      mask_use_mean,                       
       .i = date,       # indexed with date_onset 
-      .f = ~mean(.x, na.rm = T),     # function is sum() with missing values removed
+      .f = ~mean(.x, na.rm = T),     # 
       .before = days(7),
       .complete = T)               # window is the DAY and 6 prior DAYS
   )
