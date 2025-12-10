@@ -65,6 +65,10 @@ dt <- dt |>
     cum_excess_lead_3 = lead(excess_mortality_cumulative, n = 3),
     cum_excess_lead_4 = lead(excess_mortality_cumulative, n = 4),
     mask_7day_percent = mask_7day*100,
+    stringency_index_1 = lag(stringency_index, n = 1),
+    stringency_index_2 = lag(stringency_index, n = 2),
+    stringency_index_3 = lag(stringency_index, n = 3),
+    stringency_index_4 = lag(stringency_index, n = 4),
     excess_lead_1 = lead(excess_mortality, n = 1),
     excess_lead_2 = lead(excess_mortality, n = 2),
     excess_lead_3 = lead(excess_mortality, n = 3),
@@ -90,14 +94,24 @@ mod_c3 <- feols(cum_excess_lead_3 ~ mask_7day_percent | location + date, data = 
 mod_w4 <- feols(excess_lead_4 ~ mask_7day_percent | location + date, data = dt21)
 mod_c4 <- feols(cum_excess_lead_4 ~ mask_7day_percent | location + date, data = dt21)
 
-etable(mod_w1, mod_w2,mod_w3,mod_w4,
+
+mod_o1 <- feols(mask_7day_percent ~ stringency_index_1 | location + date, data = dt21)
+mod_o2 <- feols(mask_7day_percent ~ stringency_index_2 | location + date, data = dt21)
+mod_o3 <- feols(mask_7day_percent ~ stringency_index_3 | location + date, data = dt21)
+mod_o4 <- feols(mask_7day_percent ~ stringency_index_4 | location + date, data = dt21)
+
+as.data.frame(etable(mod_w1, mod_w2,mod_w3,mod_w4,
        coefstat = "confint",
   vcov = "twoway"
-)
-etable(mod_c1, mod_c2,mod_c3,mod_c4,
+)) |> clipr::write_clip()
+as.data.frame(etable(mod_c1, mod_c2,mod_c3,mod_c4,
        coefstat = "confint",
        vcov = "twoway"
-)
+))|> clipr::write_clip()
+as.data.frame(etable(mod_o1, mod_o2,mod_o3,mod_o4,
+                     coefstat = "confint",
+                     vcov = "twoway"
+))|> clipr::write_clip()
 
 dt_plot <- dt21 |> 
   filter(date>="2020-03-01") |> 
