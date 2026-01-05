@@ -185,10 +185,10 @@ geom_dotplot(aes(group=date,
                outliers = F)
 
 
-p2 <- dt21 |> 
-  filter(date>="2020-03-01") |> 
-  ggplot(aes(date))+
-  geom_boxplot(aes(group=date, y=excess_mortality), alpha=0.5, outliers=T)
+#p2 <- dt21 |> 
+#  filter(date>="2020-03-01") |> 
+#  ggplot(aes(date))+
+#  geom_boxplot(aes(group=date, y=excess_mortality), alpha=0.5, outliers=T)
 
 p1/p2
 
